@@ -1,10 +1,13 @@
+const feed = $("#instagram-feed");
+
 // jQuery Ajax for feed Instagram Graph API
-if ($("#instagram-feed1").length != 0) {
-  var token =
+if (feed.length != 0) {
+  const token =
     "IGQVJVcmpiNXFWNFNNazdXcm90UWk3akgxeXhyX0NVbkE0Q0RMRDF3ZA28tOEM1dUJEUHJZAc0paNFdGTXNqek9QR2xDWjVORndGQ1NKLTgyOHBJSlFQdXFVMzk4NV95eDNuNjhHc1FPVnhRSlpYS1g3bQZDZD";
-  var fields =
+  const fields =
     "id,media_type,media_url,thumbnail_url,timestamp,permalink,caption";
-  var limit = 6; // Set a number of display items
+  const limit = 6;
+  let html = "";
 
   $.ajax({
     url:
@@ -16,49 +19,32 @@ if ($("#instagram-feed1").length != 0) {
       limit,
     type: "GET",
     success: function (response) {
-      console.log(response);
-      for (var x in response.data) {
-        var link = response.data[x]["permalink"],
-          caption = response.data[x]["caption"],
-          image = response.data[x]["media_url"],
-          image_video = response.data[x]["thumbnail_url"],
-          html = "";
-        if (response.data[x]["media_type"] == "VIDEO") {
-          html += '<div class="instagram_new">';
-          html +=
-            '<a class="insta-link" href="' +
-            link +
-            '" rel="noopener" target="_blank">';
-          html +=
-            '<img src="' +
-            image_video +
-            '" loading="lazy" alt="' +
-            caption +
-            '" class="insta-image" />';
-          html += "</a>";
-          html += "</div>";
+      const medias = response.data;
+
+      medias.map((media) => {
+        console.log(media);
+        if (media.media_type === "VIDEO") {
+          html += `<div class="instagram_new">
+              <a class="insta-link" href="${media.permalink}" rel="noopener" target="_blank">
+                <img src="${media.image_video}" loading="lazy" alt="${media.caption}" class="insta-image" />
+              </a>
+            </div>`;
         } else {
-          html += '<div class="instagram_new">';
-          html +=
-            '<a class="insta-link" href="' +
-            link +
-            '" rel="noopener" target="_blank">';
-          html +=
-            '<img src="' +
-            image +
-            '" loading="lazy" alt="' +
-            caption +
-            '" class="insta-image" />';
-          html += "</a>";
-          html += "</div>";
+          html += `<div class="instagram_new">
+            <a class="insta-link" href="${media.permalink}" rel="noopener" target="_blank">
+              <img src="${media.media_url}" loading="lazy" alt="${media.caption}" class="insta-image" />
+            </a>
+          </div>`;
         }
-        $("#instagram-feed1").append(html);
-      }
+      });
+
+      feed.append(html);
     },
-    error: function (data) {
-      console.log(data);
-      var html = '<div class="class-no-data">No Images Found</div>';
-      $("#instagram-feed1").append(html);
+    error: function (error) {
+      console.log(error);
+
+      const html = '<div class="class-no-data">No Images Found</div>';
+      feed.append(html);
     },
   });
 }
